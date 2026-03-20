@@ -1246,6 +1246,7 @@ const App = () => {
       console.error('Failed to invite user - check table exists and RLS policies');
       showNotification('Failed to invite user. Check console for details.');
       return false;
+    }
   };
 
   const handleDeleteStudent = async (studentId) => {
