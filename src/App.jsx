@@ -312,6 +312,7 @@ const App = () => {
     } else {
       // Show error if environment variables are missing
       setConfigError('Missing Supabase configuration. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_KEY environment variables.');
+      setCurrentView('setup'); // Keep setup view so error is shown
     }
   }, [loadFromDatabase]);
 
@@ -1792,17 +1793,6 @@ const App = () => {
         darkMode={darkMode}
       />
       
-      {currentView === 'setup' && <DatabaseSetup 
-        darkMode={darkMode}
-        toggleDarkMode={toggleDarkMode}
-        showNotification={showNotification}
-        setSupabase={setSupabase}
-        setDbConfig={setDbConfig}
-        setIsConnected={setIsConnected}
-        loadFromDatabase={loadFromDatabase}
-        setCurrentView={setCurrentView}
-      />}
-      
       {configError && (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
           <div className="bg-white rounded-xl shadow-xl p-8 max-w-md text-center">
@@ -1821,6 +1811,17 @@ const App = () => {
           </div>
         </div>
       )}
+      
+      {!configError && currentView === 'setup' && <DatabaseSetup 
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
+        showNotification={showNotification}
+        setSupabase={setSupabase}
+        setDbConfig={setDbConfig}
+        setIsConnected={setIsConnected}
+        loadFromDatabase={loadFromDatabase}
+        setCurrentView={setCurrentView}
+      />}
       
       {currentView === 'login' && (
         <>
@@ -1964,6 +1965,16 @@ const App = () => {
         isConnected={isConnected}
         supabase={supabase}
       />
+      
+      {/* Fallback loading state */}
+      {!configError && !currentView && (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      )}
     </>
   );
 };
