@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS shares (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   file_id uuid REFERENCES files(id) ON DELETE CASCADE,
   owner_id uuid REFERENCES students(id) ON DELETE CASCADE,
-  recipient_id uuid REFERENCES students(id) ON DELETE CASCADE
+  recipient_id uuid NOT NULL
 );
 
 -- Create notifications table for real-time notifications

@@ -80,6 +80,12 @@ const App = () => {
 
       let studentsRes, teachersRes, filesRes, commentsRes, likesRes, sharesRes, chatRes;
 
+      // Ensure dbId is present for role-filtered fetching
+      if (userRole === 'student' && !userDbId && user?.id !== 'admin_001') {
+        console.log('Skipping load: student dbId not yet available');
+        return;
+      }
+
       if (userRole === 'student' && userDbId) {
         [studentsRes, teachersRes, filesRes, commentsRes, likesRes, sharesRes, chatRes] = await Promise.all([
           fetch(`${config.url}/rest/v1/students?select=*`, {
@@ -1019,6 +1025,7 @@ const App = () => {
                 if (saved && saved.length > 0) {
                   user.dbId = saved[0].id;
                   user.dashboard_link = saved[0].dashboard_link;
+                  setCurrentUser({ ...user });
                   setStudents(prev => [...prev, saved[0]]);
                   showNotification('Profile created successfully!');
                 }
