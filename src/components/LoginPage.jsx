@@ -19,6 +19,7 @@ const LoginPage = ({
   const [localShowUnverified, setLocalShowUnverified] = useState(showUnverifiedEmailNotification);
   const [sendingMagic, setSendingMagic] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [magicRole, setMagicRole] = useState('student');
 
   useEffect(() => {
     setLocalShowUnverified(showUnverifiedEmailNotification);
@@ -228,6 +229,45 @@ const LoginPage = ({
               </div>
             </div>
 
+            {/* Role Selector for Magic Link */}
+            {loginMode === 'magic' && (
+              <div className="animate-fade-in">
+                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  I am a
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setMagicRole('student')}
+                    className={`py-3 px-4 rounded-xl border-2 transition-all duration-300 ${
+                      magicRole === 'student'
+                        ? 'border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-indigo-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <User className="w-4 h-4" />
+                      <span className="font-medium">Student</span>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMagicRole('teacher')}
+                    className={`py-3 px-4 rounded-xl border-2 transition-all duration-300 ${
+                      magicRole === 'teacher'
+                        ? 'border-purple-500 bg-purple-500/10 text-purple-600 dark:text-purple-400'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-purple-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <GraduationCap className="w-4 h-4" />
+                      <span className="font-medium">Teacher</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {loginMode !== 'magic' && (
               <div className="animate-fade-in">
                 <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -263,7 +303,7 @@ const LoginPage = ({
                   handleLogin(formData.email, formData.password);
                 } else if (loginMode === 'magic') {
                   setSendingMagic(true);
-                  await handleMagicLink(formData.email);
+                  await handleMagicLink(formData.email, magicRole);
                   setSendingMagic(false);
                 }
               }}
