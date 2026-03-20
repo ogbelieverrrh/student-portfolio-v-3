@@ -668,10 +668,9 @@ const App = () => {
           }
           
           if (isAdminCreated) {
-            // Show credentials to admin so they can share with the user
             showNotification(`${role === 'teacher' ? 'Teacher' : 'Student'} added! Email: ${email}, Password: ${password}`);
           } else {
-            showNotification('Signup successful! Please check your email to verify your account.');
+            showNotification('Signup successful! Please check your email to verify your account. If you don\'t see it, check your spam folder.');
           }
           return true;
         } else {
@@ -1123,15 +1122,28 @@ const App = () => {
   };
 
   const handleResendVerification = async (email) => {
-    if (!supabase) return;
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email: email,
-    });
-    if (error) {
-      showNotification(`Error resending verification: ${error.message}`);
-    } else {
-      showNotification('A new verification email has been sent.');
+    if (!supabase) {
+      showNotification('Not connected to database');
+      return;
+    }
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: window.location.origin,
+        }
+      });
+      
+      if (error) {
+        showNotification(`Error: ${error.message}. Make sure email confirmations are enabled in Supabase.`);
+      } else {
+        showNotification('Verification email sent! Check your inbox.');
+      }
+    } catch (err) {
+      showNotification('Failed to resend verification email. Try again later.');
+      console.error('Resend verification error:', err);
     }
   };
 
