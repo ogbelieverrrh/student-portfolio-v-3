@@ -10,6 +10,7 @@ import AddStudentModal from './components/common/AddStudentModal';
 import AddTeacherModal from './components/common/AddTeacherModal';
 import ChatModal from './components/common/ChatModal';
 import { API_CONFIG } from './utils/apiConfig';
+import { setGlobalConfig } from './hooks/useData';
 
 // Lazy load dashboard components for code splitting
 const StudentDashboard = lazy(() => import('./components/StudentDashboard'));
@@ -35,6 +36,12 @@ const ADMIN_ACCOUNT = {
 };
 
 const App = () => {
+  // Initialize global config for TanStack hooks
+  setGlobalConfig({
+    url: API_CONFIG.SUPABASE_URL,
+    apiKey: API_CONFIG.SUPABASE_KEY
+  });
+
   const [currentView, setCurrentView] = useState('setup');
   const [currentUser, setCurrentUser] = useState(null);
   const [students, setStudents] = useState([]);
@@ -275,7 +282,7 @@ const App = () => {
 
   // Set up real-time subscriptions
   useEffect(() => {
-    if (!supabase || !isConnected) return;
+    if (!supabase || !isConnected || !currentUser) return;
 
     const channels = [];
 
