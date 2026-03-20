@@ -1650,10 +1650,15 @@ const App = () => {
       });
 
       recipientIds.forEach(recipientId => {
-        const recipient = students.find(s => s.id === recipientId);
+        // Check both students and teachers arrays
+        const studentRecipient = students.find(s => s.id === recipientId);
+        const teacherRecipient = teachers.find(t => t.id === recipientId);
+        const recipient = studentRecipient || teacherRecipient;
+        
         if (recipient) {
+          const roleLabel = studentRecipient ? 'student' : 'teacher';
           addNotification(recipientId, `${currentUser.name} shared a file with you: ${file.name}`, 'share');
-          sendEmailNotification(recipient.email, 'File Shared With You', `${currentUser.name} shared ${file.name} with you`);
+          sendEmailNotification(recipient.email, 'File Shared With You', `${currentUser.name} (${roleLabel}) shared ${file.name} with you`);
         }
       });
 
@@ -1757,6 +1762,7 @@ const App = () => {
         selectedFileForShare={selectedFileForShare}
         setSelectedFileForShare={setSelectedFileForShare}
         students={students}
+        teachers={teachers}
         currentUser={currentUser}
         handleShareFile={handleShareFile}
         darkMode={darkMode}
