@@ -657,8 +657,11 @@ const App = () => {
           dashboard_link: `${window.location.origin}?user=${data.user.id}`,
         };
 
-        const endpoint = role === 'teacher' ? 'teachers' : 'students';
+          const endpoint = role === 'teacher' ? 'teachers' : 'students';
+        console.log('Creating user profile:', endpoint, newUserProfile);
+        
         const saved = await saveToDatabase(endpoint, newUserProfile);
+        console.log('Save result:', saved);
 
         if (saved && saved.length > 0) {
           if (role === 'teacher') {
@@ -674,7 +677,9 @@ const App = () => {
           }
           return true;
         } else {
-          showNotification('Error creating user profile. Please contact support.');
+          // Show more helpful error
+          console.error('Failed to save user profile. Check if tables exist and RLS policies allow insert.');
+          showNotification('Error: Could not create profile. Please ensure the students/teachers table exists with proper permissions.');
           return false;
         }
       } else {
@@ -1223,7 +1228,10 @@ const App = () => {
       };
       
       const endpoint = role === 'teacher' ? 'teachers' : 'students';
+      console.log('Inviting user:', endpoint, newUserProfile);
+      
       const saved = await saveToDatabase(endpoint, newUserProfile);
+      console.log('Invite save result:', saved);
       
       if (saved && saved.length > 0) {
         if (role === 'teacher') {
@@ -1234,10 +1242,10 @@ const App = () => {
         showNotification(`Invited ${email}! Password: ${randomPassword} (share with user)`);
         return true;
       }
-    }
-    
-    showNotification('Failed to invite user');
-    return false;
+      
+      console.error('Failed to invite user - check table exists and RLS policies');
+      showNotification('Failed to invite user. Check console for details.');
+      return false;
   };
 
   const handleDeleteStudent = async (studentId) => {
