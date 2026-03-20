@@ -9,6 +9,7 @@ import SendFileModal from './components/common/SendFileModal';
 import AddStudentModal from './components/common/AddStudentModal';
 import AddTeacherModal from './components/common/AddTeacherModal';
 import ChatModal from './components/common/ChatModal';
+import { API_CONFIG } from './utils/apiConfig';
 
 // Lazy load dashboard components for code splitting
 const StudentDashboard = lazy(() => import('./components/StudentDashboard'));
@@ -65,9 +66,7 @@ const App = () => {
   const [loadingMessage, setLoadingMessage] = useState('');
   
   // Pagination states for better performance
-  const [filesPage, setFilesPage] = useState(0);
   const FILES_PAGE_SIZE = 20;
-  const [hasMoreFiles, setHasMoreFiles] = useState(true);
 
   const loadFromDatabase = useCallback(async (config, user = null) => {
     if (!config.url || !config.key) return;
@@ -238,56 +237,15 @@ const App = () => {
     } 
   }, []);
 
-  // Optimized function to load more files with pagination
-  // eslint-disable-next-line no-unused-vars
-  const loadMoreFiles = useCallback(async () => {
-    if (!isConnected || !hasMoreFiles || !currentUser) return;
-
-    try {
-      const offset = (filesPage + 1) * FILES_PAGE_SIZE;
-      let endpoint;
-
-      if (currentUser.role === 'student') {
-        endpoint = `files?student_id=eq.${currentUser.dbId}&select=*&order=created_at.desc&limit=${FILES_PAGE_SIZE}&offset=${offset}`;
-      } else if (currentUser.role === 'teacher') {
-        endpoint = `files?select=*&order=created_at.desc&limit=${FILES_PAGE_SIZE}&offset=${offset}`;
-      } else {
-        endpoint = `files?select=*&order=created_at.desc&limit=${FILES_PAGE_SIZE}&offset=${offset}`;
-      }
-
-      const response = await fetch(`${dbConfig.url}/rest/v1/${endpoint}`, {
-        headers: { 'apikey': dbConfig.key, 'Authorization': `Bearer ${dbConfig.key}` }
-      });
-      const newFiles = await response.json();
-
-      if (newFiles && newFiles.length > 0) {
-        const updatedFilesMap = { ...files };
-        newFiles.forEach(file => {
-          if (!updatedFilesMap[file.student_id]) {
-            updatedFilesMap[file.student_id] = [];
-          }
-          updatedFilesMap[file.student_id].push(file);
-        });
-        setFiles(updatedFilesMap);
-        setFilesPage(prev => prev + 1);
-        setHasMoreFiles(newFiles.length === FILES_PAGE_SIZE);
-      } else {
-        setHasMoreFiles(false);
-      }
-    } catch (error) {
-      console.error('Error loading more files:', error);
-    }
-  }, [isConnected, hasMoreFiles, currentUser, filesPage, files, dbConfig]);
-
   useEffect(() => {
     const savedTheme = localStorage.getItem('darkMode');
     if (savedTheme === 'true') {
       setDarkMode(true);
     }
 
-    // Hardcoded Supabase configuration - no manual entry needed
-    const envUrl = 'https://mkctqcmuhaoxrkjfzghq.supabase.co';
-    const envKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rY3RxY211aGFveHJramZ6Z2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODIwODksImV4cCI6MjA4Nzg1ODA4OX0.MmwRsxQhIz4r7zWQi1kSnxnCFOQHKibA_cFPV4RsLQA';
+    // Use centralized Supabase configuration
+    const envUrl = API_CONFIG.SUPABASE_URL;
+    const envKey = API_CONFIG.SUPABASE_KEY;
     
     // Always connect automatically
     fetch(`${envUrl}/rest/v1/`, {
@@ -331,6 +289,7 @@ const App = () => {
           const newFile = payload.new;
           setFiles(prev => {
             const studentFiles = prev[newFile.student_id] || [];
+            if (studentFiles.some(f => f.id === newFile.id)) return prev;
             return {
               ...prev,
               [newFile.student_id]: [...studentFiles, newFile]
@@ -358,7 +317,10 @@ const App = () => {
         console.log('Students change detected:', payload);
         
         if (payload.eventType === 'INSERT') {
-          setStudents(prev => [...prev, payload.new]);
+          setStudents(prev => {
+            if (prev.some(s => s.id === payload.new.id)) return prev;
+            return [...prev, payload.new];
+          });
           // Note: Notification is already handled in signup process
         } else if (payload.eventType === 'DELETE') {
           setStudents(prev => prev.filter(s => s.id !== payload.old.id));
@@ -374,7 +336,10 @@ const App = () => {
         console.log('Teachers change detected:', payload);
         
         if (payload.eventType === 'INSERT') {
-          setTeachers(prev => [...prev, payload.new]);
+          setTeachers(prev => {
+            if (prev.some(t => t.id === payload.new.id)) return prev;
+            return [...prev, payload.new];
+          });
           // Note: Notification is already handled in signup process
         } else if (payload.eventType === 'DELETE') {
           setTeachers(prev => prev.filter(t => t.id !== payload.old.id));
@@ -391,14 +356,17 @@ const App = () => {
         
         if (payload.eventType === 'INSERT') {
           const newShare = payload.new;
-          setShares(prev => ({
-            ...prev,
-            [newShare.id]: {
-              fileId: newShare.file_id,
-              ownerId: newShare.owner_id,
-              recipientId: newShare.recipient_id,
-            }
-          }));
+          setShares(prev => {
+            if (prev[newShare.id]) return prev;
+            return {
+              ...prev,
+              [newShare.id]: {
+                fileId: newShare.file_id,
+                ownerId: newShare.owner_id,
+                recipientId: newShare.recipient_id,
+              }
+            };
+          });
           // Note: Notification is already handled in handleShareFile
         }
       })
@@ -415,6 +383,7 @@ const App = () => {
           const newComment = payload.new;
           setComments(prev => {
             const fileComments = prev[newComment.file_id] || [];
+            if (fileComments.some(c => c.id === newComment.id)) return prev;
             return {
               ...prev,
               [newComment.file_id]: [...fileComments, newComment]
@@ -436,6 +405,7 @@ const App = () => {
           const newLike = payload.new;
           setLikes(prev => {
             const fileLikes = prev[newLike.file_id] || [];
+            if (fileLikes.includes(newLike.user_id)) return prev;
             return {
               ...prev,
               [newLike.file_id]: [...fileLikes, newLike.user_id]
@@ -723,8 +693,6 @@ const App = () => {
     setIsLoggingIn(true);
     setLoadingProgress(0);
     setLoadingMessage('Connecting...');
-    setFilesPage(0);
-    setHasMoreFiles(true);
     
     if (email === ADMIN_ACCOUNT.email && password === ADMIN_ACCOUNT.password) {
       setLoadingMessage('Loading data...');
@@ -770,9 +738,6 @@ const App = () => {
       
       setStudents(studentsData || []);
       setTeachers(teachersData || []);
-      
-      // Check if there are more files
-      setHasMoreFiles((filesData || []).length >= FILES_PAGE_SIZE);
       
       const filesMap = {};
       (filesData || []).forEach(file => {
@@ -914,7 +879,6 @@ const App = () => {
               }
             });
             setFiles(initialFilesMap);
-            setHasMoreFiles((allFilesData || []).length >= FILES_PAGE_SIZE);
             
             setLoadingProgress(50);
             
@@ -1070,7 +1034,6 @@ const App = () => {
               const filesMap = {};
               filesMap[user.dbId] = userFilesData || [];
               setFiles(filesMap);
-              setHasMoreFiles((userFilesData || []).length >= FILES_PAGE_SIZE);
               
               // Build shares map
               const sharesMap = {};
@@ -1406,7 +1369,7 @@ const App = () => {
 
     // Determine if this is a general chat message
     const isGeneral = !recipient || recipient.id === 'general';
-    const senderId = sender.id || sender.dbId;
+    const senderId = sender.dbId || sender.id;
 
     console.log('Sending message:', { messageText, recipient, isGeneral, senderId });
 
@@ -1454,7 +1417,7 @@ const App = () => {
     }
 
     const isGeneral = recipient?.id === 'general' || !recipient;
-    const senderId = sender.id || sender.dbId;
+    const senderId = sender.dbId || sender.id;
 
     const newMessage = {
       sender_id: senderId,
@@ -1503,46 +1466,23 @@ const App = () => {
 
   const handleDeleteFile = async (studentId, fileId) => {
     if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-      if (isConnected) {
-        await fetch(`${dbConfig.url}/rest/v1/files?id=eq.${fileId}`, {
-          method: 'DELETE',
-          headers: {
-            'apikey': dbConfig.key,
-            'Authorization': `Bearer ${dbConfig.key}`
-          }
-        });
-        
-        // Also delete related likes and comments
-        await fetch(`${dbConfig.url}/rest/v1/likes?file_id=eq.${fileId}`, {
-          method: 'DELETE',
-          headers: {
-            'apikey': dbConfig.key,
-            'Authorization': `Bearer ${dbConfig.key}`
-          }
-        });
-        await fetch(`${dbConfig.url}/rest/v1/comments?file_id=eq.${fileId}`, {
-          method: 'DELETE',
-          headers: {
-            'apikey': dbConfig.key,
-            'Authorization': `Bearer ${dbConfig.key}`
-          }
-        });
-        await fetch(`${dbConfig.url}/rest/v1/shares?file_id=eq.${fileId}`, {
-          method: 'DELETE',
-          headers: {
-            'apikey': dbConfig.key,
-            'Authorization': `Bearer ${dbConfig.key}`
-          }
-        });
-        
-        // Update local state
-        const studentFiles = files[studentId] || [];
-        const updatedFiles = {
-          ...files,
-          [studentId]: studentFiles.filter(f => f.id !== fileId)
-        };
-        setFiles(updatedFiles);
-        showNotification('File deleted successfully!');
+      if (isConnected && supabase) {
+        try {
+          const { error } = await supabase.from('files').delete().eq('id', fileId);
+          if (error) throw error;
+
+          // Update local state (cascading deletes for likes, comments, and shares are handled by DB)
+          const studentFiles = files[studentId] || [];
+          const updatedFiles = {
+            ...files,
+            [studentId]: studentFiles.filter(f => f.id !== fileId)
+          };
+          setFiles(updatedFiles);
+          showNotification('File deleted successfully!');
+        } catch (error) {
+          console.error('Error deleting file:', error);
+          showNotification(`Error: ${error.message || 'File not deleted.'}`);
+        }
       } else {
         showNotification('Error: Not connected to database. File not deleted.');
       }

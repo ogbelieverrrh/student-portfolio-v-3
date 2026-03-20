@@ -83,7 +83,7 @@ const ChatModal = ({
 
   // Filter messages based on chat type
   const getFilteredMessages = () => {
-    const currentUserId = currentUser.id || currentUser.dbId;
+    const currentUserId = currentUser.dbId || currentUser.id;
     const currentUserIdStr = String(currentUserId || '');
     
     if (chatType === 'general') {
