@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Lock, Moon, Sun, Mail, Zap } from 'lucide-react';
+import { User, Lock, Moon, Sun, Mail, Zap, GraduationCap, Sparkles, ArrowRight, MailOpen } from 'lucide-react';
 
 const LoginPage = ({
   darkMode,
@@ -14,218 +14,306 @@ const LoginPage = ({
   unverifiedEmail,
   isLoggingIn,
 }) => {
-  const [loginMode, setLoginMode] = useState('login'); // 'login', 'signup', 'magic'
+  const [loginMode, setLoginMode] = useState('login');
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [localShowUnverified, setLocalShowUnverified] = useState(showUnverifiedEmailNotification);
   const [sendingMagic, setSendingMagic] = useState(false);
-  const [magicRole, setMagicRole] = useState('student'); // Role selection for magic link
+  const [magicRole, setMagicRole] = useState('student');
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     setLocalShowUnverified(showUnverifiedEmailNotification);
   }, [showUnverifiedEmailNotification]);
 
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 20,
+        y: (e.clientY / window.innerHeight) * 20,
+      });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'} flex items-center justify-center p-2 sm:p-4 animate-fade-in`}>
-      {!darkMode && (
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-10 sm:top-20 left-4 sm:left-10 w-48 sm:w-72 h-48 sm:h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-          <div className="absolute top-20 sm:top-40 right-4 sm:right-10 w-48 sm:w-72 h-48 sm:h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-10 sm:bottom-20 left-1/2 w-48 sm:w-72 h-48 sm:h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-        </div>
-      )}
+    <div className={`min-h-screen relative overflow-hidden ${darkMode ? 'bg-gray-950' : 'bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900'}`}>
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Floating Orbs */}
+        <div 
+          className="absolute w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse"
+          style={{ 
+            top: '10%', 
+            left: '10%', 
+            transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+            animationDuration: '8s'
+          }}
+        />
+        <div 
+          className="absolute w-80 h-80 bg-pink-500/25 rounded-full blur-3xl animate-pulse"
+          style={{ 
+            bottom: '20%', 
+            right: '15%', 
+            transform: `translate(${-mousePosition.x}px, ${-mousePosition.y}px)`,
+            animationDuration: '10s',
+            animationDelay: '2s'
+          }}
+        />
+        <div 
+          className="absolute w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ 
+            top: '50%', 
+            left: '50%', 
+            transform: `translate(${-mousePosition.x * 1.5}px, ${mousePosition.y * 1.5}px)`,
+            animationDuration: '12s',
+            animationDelay: '4s'
+          }}
+        />
+        
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-10" style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+          backgroundSize: '40px 40px'
+        }} />
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+      </div>
 
-      <div className={`${darkMode ? 'bg-gray-800' : 'bg-white/80 backdrop-blur-sm'} rounded-2xl shadow-2xl p-4 sm:p-8 w-full max-w-md relative z-10 animate-scale-in`}>
-        <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-          <button
-            onClick={toggleDarkMode}
-            className={`p-2 rounded-lg ${darkMode ? 'bg-gray-700 text-yellow-400' : 'bg-gray-100 text-gray-600'} hover:scale-110 transition-transform`}
-          >
-            {darkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
-          </button>
-        </div>
-
-        <div className="text-center mb-4 sm:mb-6">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl sm:rounded-2xl mx-auto mb-3 sm:mb-4 flex items-center justify-center animate-float">
-            <User className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-          </div>
-          <h1 className={`text-xl sm:text-3xl font-bold ${darkMode ? 'text-white' : 'bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'}`}>
-            Student Portfolio
-          </h1>
-          <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-1 sm:mt-2 text-sm sm:text-base`}>Showcase your work beautifully</p>
-        </div>
-
-        {localShowUnverified && (
-          <div className={`mb-3 sm:mb-4 p-2 sm:p-3 ${darkMode ? 'bg-red-900/20 border-red-800 text-red-300' : 'bg-red-50 border-red-200 text-red-800'} border rounded-lg flex flex-col items-center gap-1 sm:gap-2 text-xs sm:text-sm`}>
-            <p>Your email is not verified. Please check your inbox for a confirmation link.</p>
-            <button
-              onClick={() => handleResendVerification(unverifiedEmail)}
-              className="font-semibold underline text-xs sm:text-sm"
-            >
-              Resend Verification Email
-            </button>
-          </div>
-        )}
-
-        {/* Three tabs: Login, Magic Link, Sign Up */}
-        <div className={`flex mb-4 sm:mb-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg p-1`}>
-          <button
-            onClick={() => {
-              setLoginMode('login');
-              setLocalShowUnverified(false);
-            }}
-            className={`flex-1 py-1.5 sm:py-2 rounded-lg transition-all duration-300 flex items-center justify-center gap-1 text-xs sm:text-sm ${loginMode === 'login' ? (darkMode ? 'bg-gray-600 shadow-md text-white' : 'bg-white shadow-md text-indigo-600') : (darkMode ? 'text-gray-300' : 'text-gray-600')}`}
-          >
-            <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Login</span>
-            <span className="sm:hidden">Log</span>
-          </button>
-          <button
-            onClick={() => {
-              setLoginMode('magic');
-              setLocalShowUnverified(false);
-            }}
-            className={`flex-1 py-1.5 sm:py-2 rounded-lg transition-all duration-300 flex items-center justify-center gap-1 text-xs sm:text-sm ${loginMode === 'magic' ? (darkMode ? 'bg-gray-600 shadow-md text-white' : 'bg-white shadow-md text-indigo-600') : (darkMode ? 'text-gray-300' : 'text-gray-600')}`}
-          >
-            <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Magic Link</span>
-            <span className="sm:hidden">Magic</span>
-          </button>
-          <button
-            onClick={() => {
-              setLoginMode('signup');
-              setLocalShowUnverified(false);
-            }}
-            disabled={!signupEnabled}
-            className={`flex-1 py-1.5 sm:py-2 rounded-lg transition-all duration-300 flex items-center justify-center gap-1 text-xs sm:text-sm ${loginMode === 'signup' ? (darkMode ? 'bg-gray-600 shadow-md text-white' : 'bg-white shadow-md text-indigo-600') : (darkMode ? 'text-gray-300' : 'text-gray-600')} ${!signupEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            <User className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Sign Up</span>
-            <span className="sm:hidden">Sign</span>
-          </button>
-        </div>
-
-        {!signupEnabled && loginMode === 'signup' && (
-          <div className={`mb-4 p-3 ${darkMode ? 'bg-yellow-900/20 border-yellow-800 text-yellow-300' : 'bg-yellow-50 border-yellow-200 text-yellow-800'} border rounded-lg flex items-center gap-2 text-sm`}>
-            <Lock className="w-4 h-4" />
-            Student signup is currently disabled
-          </div>
-        )}
-
-        <div className="space-y-3 sm:space-y-4">
-          {/* Sign Up Form */}
-          {loginMode === 'signup' && signupEnabled && (
-            <div className="animate-slide-down">
-              <input
-                type="text"
-                placeholder="Full Name"
-                className={`w-full p-2 sm:p-3 border-2 text-sm sm:text-base ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-200'} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none`}
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
+      {/* Main Container */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        {/* Login Card */}
+        <div 
+          className="w-full max-w-md"
+          style={{ transform: `translate(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)` }}
+        >
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl mb-4 shadow-2xl shadow-purple-500/30 animate-bounce" style={{ animationDuration: '3s' }}>
+              <GraduationCap className="w-10 h-10 text-white" />
             </div>
-          )}
-
-          {/* Email - always shown */}
-          <div className="relative">
-            <Mail className={`absolute left-2 sm:left-3 top-2.5 sm:top-3 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`} />
-            <input
-              type="email"
-              placeholder="Email"
-              className={`w-full p-2 sm:p-3 pl-8 sm:pl-10 border-2 text-sm sm:text-base ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-200'} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none`}
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
+            <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
+              Student<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400">Portfolio</span>
+            </h1>
+            <p className="text-gray-400 text-lg">Showcase your brilliance to the world</p>
           </div>
 
-          {/* Role selector for Magic Link */}
-          {loginMode === 'magic' && (
-            <div className="flex gap-2">
+          {/* Verification Warning */}
+          {localShowUnverified && (
+            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-xl backdrop-blur-sm animate-shake">
+              <div className="flex items-center gap-3 text-red-300">
+                <MailOpen className="w-5 h-5 flex-shrink-0" />
+                <p className="text-sm">Please verify your email. Check your inbox for the confirmation link.</p>
+              </div>
               <button
-                type="button"
-                onClick={() => setMagicRole('student')}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                  magicRole === 'student'
-                    ? 'bg-indigo-600 text-white'
-                    : darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
-                }`}
+                onClick={() => handleResendVerification(unverifiedEmail)}
+                className="mt-2 text-sm text-red-200 underline hover:text-white transition-colors"
               >
-                Student
-              </button>
-              <button
-                type="button"
-                onClick={() => setMagicRole('teacher')}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                  magicRole === 'teacher'
-                    ? 'bg-purple-600 text-white'
-                    : darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                Teacher
+                Resend verification email
               </button>
             </div>
           )}
 
-          {/* Password - only for login and signup */}
-          {loginMode !== 'magic' && (
-            <div className="animate-slide-down">
-              <input
-                type="password"
-                placeholder="Password"
-                className={`w-full p-2 sm:p-3 border-2 text-sm sm:text-base ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-200'} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none`}
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+          {/* Main Card */}
+          <div className={`backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden ${darkMode ? 'bg-gray-900/80' : 'bg-white/10'}`}>
+            {/* Tab Navigation */}
+            <div className="flex p-2 gap-2">
+              {[
+                { id: 'login', icon: Lock, label: 'Welcome Back' },
+                { id: 'magic', icon: Zap, label: 'Magic Link' },
+                { id: 'signup', icon: Sparkles, label: 'Join Us' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => tab.id !== 'signup' || signupEnabled ? (setLoginMode(tab.id), setLocalShowUnverified(false)) : null}
+                  disabled={tab.id === 'signup' && !signupEnabled}
+                  className={`flex-1 relative py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                    loginMode === tab.id 
+                      ? 'text-white' 
+                      : `${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-300 hover:text-white'}`
+                  } ${tab.id === 'signup' && !signupEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                >
+                  {loginMode === tab.id && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg shadow-purple-500/25" />
+                  )}
+                  <span className="relative flex items-center justify-center gap-2">
+                    <tab.icon className="w-4 h-4" />
+                    {tab.label}
+                  </span>
+                </button>
+              ))}
             </div>
-          )}
 
-          {/* Action Button */}
-          <button
-            onClick={async () => {
-              if (loginMode === 'signup' && signupEnabled) {
-                const success = await handleSignup(formData.name, formData.email, formData.password, 'student', false);
-                if (success) {
-                  setFormData({ name: '', email: '', password: '' });
-                  setLoginMode('login');
-                }
-              } else if (loginMode === 'login') {
-                handleLogin(formData.email, formData.password);
-              } else if (loginMode === 'magic') {
-                setSendingMagic(true);
-                await handleMagicLink(formData.email, magicRole);
-                setSendingMagic(false);
-              }
-            }}
-            disabled={(loginMode === 'signup' && !signupEnabled) || sendingMagic || isLoggingIn}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-2 sm:p-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 text-sm sm:text-base"
-          >
-            {sendingMagic || isLoggingIn ? (
-              <>
-                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span className="hidden sm:inline">Loading...</span>
-                <span className="sm:hidden">Loading</span>
-              </>
-            ) : loginMode === 'login' ? (
-              'Sign In'
-            ) : loginMode === 'magic' ? (
-              <>
-                <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">Send Magic Link</span>
-                <span className="sm:hidden">Send Link</span>
-              </>
-            ) : (
-              'Create Account'
-            )}
-          </button>
+            {/* Form Section */}
+            <div className="p-6 sm:p-8">
+              {/* Sign Up Name Field */}
+              {loginMode === 'signup' && signupEnabled && (
+                <div className="mb-4 animate-slide-down">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Enter your full name"
+                      className="w-full py-3 pl-12 pr-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
 
-          {/* Magic Link Help */}
-          {loginMode === 'magic' && (
-            <div className={`text-center text-xs sm:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              <p>We'll send you a one-time login link to your email.</p>
-              <p className="mt-1">No password needed! ✨</p>
+              {/* Email Field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="w-full py-3 pl-12 pr-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Role Selector for Magic Link */}
+              {loginMode === 'magic' && (
+                <div className="mb-4 animate-fade-in">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">I am a</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { id: 'student', label: 'Student', icon: User, color: 'from-indigo-500 to-purple-500' },
+                      { id: 'teacher', label: 'Teacher', icon: GraduationCap, color: 'from-pink-500 to-rose-500' }
+                    ].map((role) => (
+                      <button
+                        key={role.id}
+                        type="button"
+                        onClick={() => setMagicRole(role.id)}
+                        className={`relative py-3 px-4 rounded-xl border transition-all duration-300 overflow-hidden ${
+                          magicRole === role.id
+                            ? 'border-transparent'
+                            : 'border-white/10 hover:border-white/30'
+                        }`}
+                      >
+                        {magicRole === role.id && (
+                          <div className={`absolute inset-0 bg-gradient-to-r ${role.color}`} />
+                        )}
+                        <span className={`relative flex items-center justify-center gap-2 font-medium ${
+                          magicRole === role.id ? 'text-white' : 'text-gray-400'
+                        }`}>
+                          <role.icon className="w-4 h-4" />
+                          {role.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Password Field */}
+              {loginMode !== 'magic' && (
+                <div className={`mb-6 ${loginMode === 'signup' ? 'animate-slide-down' : ''}`}>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="password"
+                      placeholder="Enter your password"
+                      className="w-full py-3 pl-12 pr-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                onClick={async () => {
+                  if (loginMode === 'signup' && signupEnabled) {
+                    const success = await handleSignup(formData.name, formData.email, formData.password, 'student', false);
+                    if (success) {
+                      setFormData({ name: '', email: '', password: '' });
+                      setLoginMode('login');
+                    }
+                  } else if (loginMode === 'login') {
+                    handleLogin(formData.email, formData.password);
+                  } else if (loginMode === 'magic') {
+                    setSendingMagic(true);
+                    await handleMagicLink(formData.email, magicRole);
+                    setSendingMagic(false);
+                  }
+                }}
+                disabled={(loginMode === 'signup' && !signupEnabled) || sendingMagic || isLoggingIn}
+                className="w-full relative py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden group"
+              >
+                <span className="relative flex items-center justify-center gap-2">
+                  {sendingMagic || isLoggingIn ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Please wait...</span>
+                    </>
+                  ) : (
+                    <>
+                      {loginMode === 'login' ? 'Sign In' : loginMode === 'magic' ? 'Send Magic Link' : 'Create Account'}
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </span>
+              </button>
+
+              {/* Magic Link Help */}
+              {loginMode === 'magic' && (
+                <div className="mt-4 text-center animate-fade-in">
+                  <p className="text-gray-400 text-sm">
+                    We'll send you a <span className="text-purple-400 font-semibold">magic link</span> to your email.
+                  </p>
+                  <p className="text-gray-500 text-xs mt-1">No password needed • Just click and login</p>
+                </div>
+              )}
+
+              {/* Signup Disabled Notice */}
+              {!signupEnabled && loginMode === 'signup' && (
+                <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+                  <p className="text-yellow-400 text-sm text-center flex items-center justify-center gap-2">
+                    <Lock className="w-4 h-4" />
+                    New student registrations are currently disabled
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-8">
+            <p className="text-gray-500 text-sm">
+              © 2026 Student Portfolio. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Dark Mode Toggle */}
+      <button
+        onClick={toggleDarkMode}
+        className="absolute top-4 right-4 p-3 bg-white/10 backdrop-blur-sm rounded-xl text-white hover:bg-white/20 transition-all duration-300 hover:scale-110"
+      >
+        {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      </button>
+
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };
