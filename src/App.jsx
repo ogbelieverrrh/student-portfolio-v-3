@@ -59,6 +59,7 @@ const App = () => {
   const [supabase, setSupabase] = useState(null);
   const [showUnverifiedEmailNotification, setShowUnverifiedEmailNotification] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [configError, setConfigError] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('');
@@ -308,6 +309,9 @@ const App = () => {
       }).catch(err => {
         console.error('Database connection error:', err);
       });
+    } else {
+      // Show error if environment variables are missing
+      setConfigError('Missing Supabase configuration. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_KEY environment variables.');
     }
   }, [loadFromDatabase]);
 
@@ -1798,6 +1802,26 @@ const App = () => {
         loadFromDatabase={loadFromDatabase}
         setCurrentView={setCurrentView}
       />}
+      
+      {configError && (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+          <div className="bg-white rounded-xl shadow-xl p-8 max-w-md text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Configuration Error</h2>
+            <p className="text-gray-600 mb-4">{configError}</p>
+            <p className="text-sm text-gray-500">Please add the following environment variables in your Vercel project settings:</p>
+            <div className="mt-4 bg-gray-100 rounded-lg p-3 text-left text-sm font-mono">
+              <p className="text-gray-700">REACT_APP_SUPABASE_URL</p>
+              <p className="text-gray-700">REACT_APP_SUPABASE_KEY</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {currentView === 'login' && (
         <>
           {isLoggingIn && loadingProgress > 0 && (
