@@ -238,6 +238,7 @@ const App = () => {
   }, []);
 
   // Optimized function to load more files with pagination
+  // eslint-disable-next-line no-unused-vars
   const loadMoreFiles = useCallback(async () => {
     if (!isConnected || !hasMoreFiles || !currentUser) return;
 
@@ -1036,7 +1037,6 @@ const App = () => {
             setTeachers(teachersData || []);
             
             // Create profile for new users if not exists
-            let isNewUser = false;
             if (!studentsData || studentsData.length === 0) {
               const userRole = data.user.user_metadata?.role || 'student';
               if (userRole === 'student' && signupEnabled) {
@@ -1053,7 +1053,6 @@ const App = () => {
                   user.dashboard_link = saved[0].dashboard_link;
                   setStudents(prev => [...prev, saved[0]]);
                   showNotification('Profile created successfully!');
-                  isNewUser = true;
                 }
               }
             } else {

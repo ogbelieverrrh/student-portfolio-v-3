@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo, useEffect, useRef } from 'react';
+import React, { useState, memo, useEffect, useRef } from 'react';
 import { FileText, Image, Video, Music, Eye, Trash2, Share2, MessageSquare, Heart, Send, X, Loader2 } from 'lucide-react';
 
 const FileViewer = memo(function FileViewer(props) {

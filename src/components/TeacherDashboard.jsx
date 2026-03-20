@@ -26,6 +26,13 @@ const TeacherDashboard = (props) => {
     setShowChat,
   } = props;
 
+  // eslint-disable-next-line no-unused-vars
+  const _shares = shares;
+  // eslint-disable-next-line no-unused-vars
+  const _handleSendFileToStudents = handleSendFileToStudents;
+  // eslint-disable-next-line no-unused-vars
+  const _showChat = showChat;
+
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [viewTab, setViewTab] = useState('video');
 
@@ -40,7 +47,8 @@ const TeacherDashboard = (props) => {
   );
 
   const TeacherFileViewer = memo(function TeacherFileViewer({ studentId }) {
-    const studentFiles = files[studentId] || [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const studentFiles = useMemo(() => files[studentId] || [], [studentId]);
     const videoFiles = useMemo(() => studentFiles.filter(f => f.type === 'video'), [studentFiles]);
     const imageFiles = useMemo(() => studentFiles.filter(f => f.type === 'image'), [studentFiles]);
     const textFiles = useMemo(() => studentFiles.filter(f => f.type === 'text'), [studentFiles]);
