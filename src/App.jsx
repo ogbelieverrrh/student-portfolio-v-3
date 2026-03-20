@@ -285,35 +285,34 @@ const App = () => {
       setDarkMode(true);
     }
 
-    // Always show setup initially, then try to connect
-    const envUrl = process.env.REACT_APP_SUPABASE_URL;
-    const envKey = process.env.REACT_APP_SUPABASE_KEY;
+    // Hardcoded Supabase configuration - no manual entry needed
+    const envUrl = 'https://mkctqcmuhaoxrkjfzghq.supabase.co';
+    const envKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rY3RxY211aGFveHJramZ6Z2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODIwODksImV4cCI6MjA4Nzg1ODA4OX0.MmwRsxQhIz4r7zWQi1kSnxnCFOQHKibA_cFPV4RsLQA';
     
-    if (envUrl && envKey) {
-      fetch(`${envUrl}/rest/v1/`, {
-        headers: {
-          'apikey': envKey,
-          'Authorization': `Bearer ${envKey}`
-        }
-      }).then(res => {
-        if (res.ok) {
-          const client = createClient(envUrl, envKey);
-          setSupabase(client);
-          setDbConfig({ url: envUrl, key: envKey });
-          setIsConnected(true);
-          setCurrentView('login');
-          loadFromDatabase({ url: envUrl, key: envKey });
-        } else {
-          console.error('Database connection failed');
-        }
-      }).catch(err => {
-        console.error('Database connection error:', err);
-      });
-    } else {
-      // Show error if environment variables are missing
-      setConfigError('Missing Supabase configuration. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_KEY environment variables.');
-      setCurrentView('setup'); // Keep setup view so error is shown
-    }
+    // Always connect automatically
+    fetch(`${envUrl}/rest/v1/`, {
+      headers: {
+        'apikey': envKey,
+        'Authorization': `Bearer ${envKey}`
+      }
+    }).then(res => {
+      if (res.ok) {
+        const client = createClient(envUrl, envKey);
+        setSupabase(client);
+        setDbConfig({ url: envUrl, key: envKey });
+        setIsConnected(true);
+        setCurrentView('login');
+        loadFromDatabase({ url: envUrl, key: envKey });
+      } else {
+        console.error('Database connection failed');
+        setConfigError('Database connection failed');
+        setCurrentView('setup');
+      }
+    }).catch(err => {
+      console.error('Database connection error:', err);
+      setConfigError('Cannot connect to database');
+      setCurrentView('setup');
+    });
   }, [loadFromDatabase]);
 
   // Set up real-time subscriptions
