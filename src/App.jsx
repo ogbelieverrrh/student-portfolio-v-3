@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import DatabaseSetup from './components/DatabaseSetup';
 import LoginPage from './components/LoginPage';
 import Notification from './components/common/Notification';
@@ -1935,6 +1936,9 @@ const App = () => {
           </div>
         </div>
       )}
+      
+      {/* Vercel Speed Insights */}
+      <SpeedInsights />
     </>
   );
 };
