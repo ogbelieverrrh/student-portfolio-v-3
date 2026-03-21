@@ -35,7 +35,7 @@ const StudentDashboard = (props) => {
   const [viewTab, setViewTab] = useState('video');
   const [fileType, setFileType] = useState('video');
 
-  const studentFiles = useMemo(() => files[currentUser.dbId] || [], [files, currentUser.dbId]);
+  const studentFiles = useMemo(() => files[currentUser?.dbId] || [], [files, currentUser?.dbId]);
   
   // Files sent by teachers (handle both boolean and string from Supabase)
   const receivedFromTeacher = useMemo(() => 
@@ -57,20 +57,20 @@ const StudentDashboard = (props) => {
   
   const sharedWithMe = useMemo(() => 
     Object.values(shares)
-      .filter(share => share.recipientId === currentUser.dbId)
+      .filter(share => share.recipientId === currentUser?.dbId)
       .map(share => Object.values(files).flat().find(f => f.id === share.fileId))
       .filter(Boolean),
-    [shares, files, currentUser.dbId]
+    [shares, files, currentUser?.dbId]
   );
 
   const unreadNotifications = useMemo(() => 
-    notifications.filter(n => n.userId === currentUser.dbId && !n.read).length,
-    [notifications, currentUser.dbId]
+    notifications.filter(n => n.userId === currentUser?.dbId && !n.read).length,
+    [notifications, currentUser?.dbId]
   );
   
   const chatNotifications = useMemo(() => 
-    notifications.filter(n => n.userId === currentUser.dbId && n.type === 'chat' && !n.read).length,
-    [notifications, currentUser.dbId]
+    notifications.filter(n => n.userId === currentUser?.dbId && n.type === 'chat' && !n.read).length,
+    [notifications, currentUser?.dbId]
   );
 
   const FileList = ({ fileList, type }) => (
@@ -143,8 +143,8 @@ const StudentDashboard = (props) => {
             </button>
             <div className="flex items-center gap-2 bg-white/20 px-2 sm:px-4 py-2 rounded-lg backdrop-blur-sm">
               <User className="w-4 h-5 sm:w-5 h-5" />
-              <span className="hidden sm:inline text-sm">{currentUser.name}</span>
-              <span className="sm:hidden text-xs">{currentUser.name?.split(' ')[0]}</span>
+              <span className="hidden sm:inline text-sm">{currentUser?.name || 'Student'}</span>
+              <span className="sm:hidden text-xs">{currentUser?.name?.split(' ')[0] || 'S'}</span>
             </div>
             <button onClick={() => { setCurrentUser(null); setCurrentView('login'); }} className="flex items-center gap-1 sm:gap-2 bg-white/20 hover:bg-white/30 px-2 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm">
               <LogOut className="w-3 h-4 sm:w-4 sm:h-4" />
@@ -160,7 +160,7 @@ const StudentDashboard = (props) => {
             <Link2 className={`w-4 h-4 ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
             <span className={`font-semibold ${darkMode ? 'text-gray-300' : ''}`}>Your Dashboard Link:</span>
           </div>
-          <code className={`${darkMode ? 'bg-indigo-900/30 text-indigo-300' : 'bg-indigo-50 text-indigo-700'} px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm block mt-1 overflow-x-auto whitespace-nowrap`}>{currentUser.dashboard_link || currentUser.dashboardLink}</code>
+          <code className={`${darkMode ? 'bg-indigo-900/30 text-indigo-300' : 'bg-indigo-50 text-indigo-700'} px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm block mt-1 overflow-x-auto whitespace-nowrap`}>{currentUser?.dashboard_link || currentUser?.dashboardLink || ''}</code>
         </div>
 
         <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 flex-wrap">

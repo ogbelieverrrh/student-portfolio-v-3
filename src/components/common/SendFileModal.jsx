@@ -76,7 +76,7 @@ const SendFileModal = ({
     }
 
     setSending(true);
-    const recipientIds = sendToAll ? students.map(s => s.id) : selectedStudents;
+    const recipientIds = sendToAll ? (students || []).map(s => s.id) : selectedStudents;
     await handleSendFileToStudents(selectedFile, recipientIds, fileNote);
     setSending(false);
     

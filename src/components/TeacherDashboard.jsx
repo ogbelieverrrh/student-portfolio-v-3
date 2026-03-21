@@ -37,13 +37,13 @@ const TeacherDashboard = (props) => {
   const [viewTab, setViewTab] = useState('video');
 
   const unreadNotifications = useMemo(() => 
-    notifications.filter(n => n.userId === currentUser.dbId && !n.read).length,
-    [notifications, currentUser.dbId]
+    notifications.filter(n => n.userId === currentUser?.dbId && !n.read).length,
+    [notifications, currentUser?.dbId]
   );
   
   const chatNotifications = useMemo(() => 
-    notifications.filter(n => n.userId === currentUser.dbId && n.type === 'chat' && !n.read).length,
-    [notifications, currentUser.dbId]
+    notifications.filter(n => n.userId === currentUser?.dbId && n.type === 'chat' && !n.read).length,
+    [notifications, currentUser?.dbId]
   );
 
   const TeacherFileViewer = memo(function TeacherFileViewer({ studentId }) {
@@ -166,7 +166,7 @@ const TeacherDashboard = (props) => {
             </button>
             <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm">
               <User className="w-5 h-5" />
-              <span>{currentUser.name}</span>
+              <span>{currentUser?.name || 'Teacher'}</span>
             </div>
             <button
               onClick={() => { setCurrentUser(null); setCurrentView('login'); }}
@@ -185,7 +185,7 @@ const TeacherDashboard = (props) => {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Link2 className={`w-4 h-4 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
             <span className={`font-semibold ${darkMode ? 'text-gray-300' : ''}`}>Your Dashboard Link:</span>
-            <code className={`${darkMode ? 'bg-purple-900/30 text-purple-300' : 'bg-purple-50 text-purple-700'} px-3 py-1 rounded-lg`}>{currentUser.dashboard_link || currentUser.dashboardLink}</code>
+            <code className={`${darkMode ? 'bg-purple-900/30 text-purple-300' : 'bg-purple-50 text-purple-700'} px-3 py-1 rounded-lg`}>{currentUser?.dashboard_link || currentUser?.dashboardLink || ''}</code>
           </div>
         </div>
 

@@ -18,11 +18,11 @@ const ShareModal = ({
   if (!showShareModal || !selectedFileForShare) return null;
 
   // Filter out current user from students
-  const availableStudents = students.filter(s => s.id !== currentUser.dbId);
+  const availableStudents = (students || []).filter(s => s.id !== currentUser?.dbId);
   // Teachers can share with students
-  const canShareWithStudents = currentUser.role === 'student' || currentUser.role === 'teacher';
+  const canShareWithStudents = currentUser?.role === 'student' || currentUser?.role === 'teacher';
   // Teachers can share with other teachers
-  const canShareWithTeachers = currentUser.role === 'teacher';
+  const canShareWithTeachers = currentUser?.role === 'teacher';
 
   const handleToggle = (id, list, setList) => {
     if (list.includes(id)) {

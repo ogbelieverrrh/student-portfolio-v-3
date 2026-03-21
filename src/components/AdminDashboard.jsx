@@ -38,8 +38,8 @@ const AdminDashboard = ({
   const [inviting, setInviting] = useState(false);
   const [activeTab, setActiveTab] = useState('users');
 
-  const unreadNotifications = notifications.filter(n => n.userId === currentUser.id && !n.read).length;
-  const chatNotifications = notifications.filter(n => n.userId === currentUser.id && n.type === 'chat' && !n.read).length;
+  const unreadNotifications = notifications.filter(n => n.userId === currentUser?.id && !n.read).length;
+  const chatNotifications = notifications.filter(n => n.userId === currentUser?.id && n.type === 'chat' && !n.read).length;
 
   // Get all files from all students
   const allFiles = Object.values(files).flat();

@@ -13,7 +13,7 @@ const PaginatedFileList = ({
   
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [files.length]);
+  }, [files]);
   
   const totalPages = Math.ceil(files.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;

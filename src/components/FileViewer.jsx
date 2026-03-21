@@ -34,11 +34,11 @@ const FileViewer = memo(function FileViewer(props) {
     setMediaLoaded(true);
   };
 
-  const fileComments = comments[file.id] || [];
-  const fileLikes = likes[file.id] || [];
+  const fileComments = comments?.[file.id] || [];
+  const fileLikes = likes?.[file.id] || [];
   // Check both id and dbId to support all user roles
   const currentUserId = currentUser?.dbId || currentUser?.id;
-  const isLiked = fileLikes.includes(currentUserId);
+  const isLiked = currentUserId ? fileLikes.includes(currentUserId) : false;
 
   return (
     <div className={`border-2 ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-100'} rounded-xl overflow-hidden hover:border-indigo-300 hover:shadow-md transition-all duration-300`}>

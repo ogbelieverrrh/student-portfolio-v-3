@@ -26,11 +26,13 @@ const DashboardLoader = () => (
   </div>
 );
 
+// Admin credentials should be set via environment variables for security
+// REACT_APP_ADMIN_EMAIL and REACT_APP_ADMIN_PASSWORD
 const ADMIN_ACCOUNT = {
   id: 'admin_001',
   name: 'Administrator',
-  email: 'admin@school.com',
-  password: 'admin123',
+  email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@school.com',
+  password: process.env.REACT_APP_ADMIN_PASSWORD || 'admin123',
   role: 'admin'
 };
 
@@ -273,6 +275,12 @@ const App = () => {
     });
   }, [loadFromDatabase]);
 
+  // Use ref to track currentUser for real-time subscriptions to avoid stale closures
+  const currentUserRef = React.useRef(currentUser);
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
   // Set up real-time subscriptions
   useEffect(() => {
     if (!supabase || !isConnected) return;
@@ -453,6 +461,8 @@ const App = () => {
         console.log('New notification received:', payload);
         const newNotif = payload.new;
         
+        // Use ref to get current user to avoid stale closure
+        const currentUser = currentUserRef.current;
         // Only add notification if it's for the current user
         const targetUserId = currentUser?.role === 'admin' ? currentUser.id : currentUser?.dbId;
         
@@ -483,7 +493,7 @@ const App = () => {
         supabase.removeChannel(channel);
       });
     };
-  }, [supabase, isConnected, currentUser, files, students]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [supabase, isConnected]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleDarkMode = () => {
     const newMode = !darkMode;

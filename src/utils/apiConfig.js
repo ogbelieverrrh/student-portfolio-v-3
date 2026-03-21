@@ -1,23 +1,36 @@
 // API Configuration
-// Set USE_PYTHON_SERVER=true to use the Python cache proxy
-// Set USE_PYTHON_SERVER=false to use Supabase directly
+// Credentials should be provided via environment variables for security
+// REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_KEY must be set
 
 export const API_CONFIG = {
   USE_PYTHON_SERVER: false,
   PYTHON_SERVER_URL: '/',
-  SUPABASE_URL: 'https://mkctqcmuhaoxrkjfzghq.supabase.co',
-  SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rY3RxY211aGFveHJramZ6Z2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyODIwODksImV4cCI6MjA4Nzg1ODA4OX0.MmwRsxQhIz4r7zWQi1kSnxnCFOQHKibA_cFPV4RsLQA',
+  // Use environment variables for security - fallback to empty strings if not set
+  get SUPABASE_URL() {
+    return process.env.REACT_APP_SUPABASE_URL || '';
+  },
+  get SUPABASE_KEY() {
+    return process.env.REACT_APP_SUPABASE_KEY || '';
+  },
 };
 
 export const getApiBaseUrl = () => {
   if (API_CONFIG.USE_PYTHON_SERVER) {
     return API_CONFIG.PYTHON_SERVER_URL;
   }
-  return API_CONFIG.SUPABASE_URL;
+  const url = API_CONFIG.SUPABASE_URL;
+  if (!url) {
+    console.warn('Supabase URL not configured. Please set REACT_APP_SUPABASE_URL environment variable.');
+  }
+  return url;
 };
 
 export const getApiHeaders = (supabaseKey) => {
   const key = supabaseKey || API_CONFIG.SUPABASE_KEY;
+  
+  if (!key) {
+    console.warn('Supabase key not configured. Please set REACT_APP_SUPABASE_KEY environment variable.');
+  }
   
   if (API_CONFIG.USE_PYTHON_SERVER) {
     return {

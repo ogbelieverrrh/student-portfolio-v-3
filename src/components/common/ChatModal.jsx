@@ -45,16 +45,19 @@ const ChatModal = ({
     // Add general chat option
     recipients.push({ id: 'general', name: '📢 General Chat', role: 'all', email: null });
     
-    if (currentUser.role === 'admin') {
+    const userRole = currentUser?.role;
+    const userDbId = currentUser?.dbId;
+    
+    if (userRole === 'admin') {
       // Admin can chat with everyone
-      students.forEach(s => recipients.push({ id: s.id, name: s.name, role: 'student', email: s.email }));
-      teachers.forEach(t => recipients.push({ id: t.id, name: t.name, role: 'teacher', email: t.email }));
-      recipients.push({ id: currentUser.id || currentUser.dbId, name: 'Admin (You)', role: 'admin', email: currentUser.email });
-    } else if (currentUser.role === 'teacher') {
+      (students || []).forEach(s => recipients.push({ id: s.id, name: s.name, role: 'student', email: s.email }));
+      (teachers || []).forEach(t => recipients.push({ id: t.id, name: t.name, role: 'teacher', email: t.email }));
+      recipients.push({ id: currentUser?.id || userDbId, name: 'Admin (You)', role: 'admin', email: currentUser?.email });
+    } else if (userRole === 'teacher') {
       // Teachers can chat with all students, other teachers, and admin
-      students.forEach(s => recipients.push({ id: s.id, name: s.name, role: 'student', email: s.email }));
-      teachers.forEach(t => {
-        if (t.id !== currentUser.dbId) {
+      (students || []).forEach(s => recipients.push({ id: s.id, name: s.name, role: 'student', email: s.email }));
+      (teachers || []).forEach(t => {
+        if (t.id !== userDbId) {
           recipients.push({ id: t.id, name: t.name, role: 'teacher', email: t.email });
         }
       });
@@ -62,14 +65,14 @@ const ChatModal = ({
       if (admin) {
         recipients.push({ id: admin.id, name: '👨‍💼 Admin', role: 'admin', email: admin.email });
       }
-    } else if (currentUser.role === 'student') {
+    } else if (userRole === 'student') {
       // Students can chat with other students, teachers, and admin
-      students.forEach(s => {
-        if (s.id !== currentUser.dbId) {
+      (students || []).forEach(s => {
+        if (s.id !== userDbId) {
           recipients.push({ id: s.id, name: s.name, role: 'student', email: s.email });
         }
       });
-      teachers.forEach(t => recipients.push({ id: t.id, name: t.name, role: 'teacher', email: t.email }));
+      (teachers || []).forEach(t => recipients.push({ id: t.id, name: t.name, role: 'teacher', email: t.email }));
       // Add admin as recipient for students
       if (admin) {
         recipients.push({ id: admin.id, name: '👨‍💼 Admin', role: 'admin', email: admin.email });
@@ -83,15 +86,17 @@ const ChatModal = ({
 
   // Filter messages based on chat type
   const getFilteredMessages = () => {
-    const currentUserId = currentUser.dbId || currentUser.id;
+    const currentUserId = currentUser?.dbId || currentUser?.id;
     const currentUserIdStr = String(currentUserId || '');
     
+    const messages = chatMessages || [];
+    
     if (chatType === 'general') {
-      const msgs = chatMessages.filter(m => m.is_general === true || m.is_general === 'true');
+      const msgs = messages.filter(m => m.is_general === true || m.is_general === 'true');
       return msgs;
     } else if (selectedRecipient && selectedRecipient.id !== 'general') {
       const recipientIdStr = String(selectedRecipient.id || '');
-      const msgs = chatMessages.filter(m => {
+      const msgs = messages.filter(m => {
         if (m.is_general === true || m.is_general === 'true') return false;
         
         const msgSenderId = String(m.sender_id || '');
@@ -104,7 +109,7 @@ const ChatModal = ({
       
       return msgs;
     } else if (chatType === 'private' && !selectedRecipient) {
-      return chatMessages.filter(m => {
+      return messages.filter(m => {
         if (m.is_general === true || m.is_general === 'true') return false;
         const msgSenderId = String(m.sender_id || '');
         const msgRecipientId = String(m.recipient_id || '');
@@ -198,7 +203,7 @@ const ChatModal = ({
             <div>
               <h3 className="text-white font-bold text-sm sm:text-base">Chat</h3>
               <p className="text-white/70 text-xs">
-                {currentUser.role === 'admin' ? 'Admin' : currentUser.role === 'teacher' ? 'Teacher' : 'Student'}
+                {currentUser?.role === 'admin' ? 'Admin' : currentUser?.role === 'teacher' ? 'Teacher' : 'Student'}
               </p>
             </div>
           </div>
@@ -299,7 +304,7 @@ const ChatModal = ({
             </div>
           ) : (
             filteredMessages.map((msg) => {
-              const isMyMessage = msg.sender_id === (currentUser.id || currentUser.dbId);
+              const isMyMessage = msg.sender_id === (currentUser?.id || currentUser?.dbId);
               const isGeneral = msg.is_general;
               
               return (
